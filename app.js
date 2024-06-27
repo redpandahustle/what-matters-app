@@ -104,7 +104,7 @@ app.post('/today', (req, res) => {
     }
 
     // Debugging statement to check the structure before saving
-    console.log('Data Entries:', JSON.stringify(data.entries, null, 2));
+    //console.log('Data Entries:', JSON.stringify(data.entries, null, 2));
 
     writeData(data);
     res.redirect('/today');
