@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Today</title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Today</h1>
+        <nav>
+            <a href="/what-matters">What Matters?</a>
+            <a href="/today">Today</a>
+            <a href="/history">History</a>
+        </nav>
+    </header>
+    <main>
+        <form action="/today" method="POST">
+            <% goals.forEach(goal => { %>
+                <div class="goal-entry">
+                    <h3><%= goal.category %></h3>
+                    <p><%= goal.goal %></p>
+                    <textarea name="entry" placeholder="What did you do today?"><%= entries[goal.category] || '' %></textarea>
+                    <input type="hidden" name="category" value="<%= goal.category %>">
+                    <button type="submit">Save</button>
+                </div>
+            <% }) %>
+        </form>
+    </main>
+</body>
+</html>

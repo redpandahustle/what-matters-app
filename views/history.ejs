@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>History</title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>History</h1>
+        <nav>
+            <a href="/what-matters">What Matters?</a>
+            <a href="/today">Today</a>
+            <a href="/history">History</a>
+        </nav>
+    </header>
+    <main>
+        <% goals.forEach(goal => { %>
+            <div class="goal-history">
+                <h3><%= goal.category %></h3>
+                <p><%= goal.goal %></p>
+                <ul>
+                    <% Object.keys(entries).forEach(date => { %>
+                        <% if (entries[date][goal.category]) { %>
+                            <li><%= date %>: <%= entries[date][goal.category] %></li>
+                        <% } %>
+                    <% }) %>
+                </ul>
+            </div>
+        <% }) %>
+    </main>
+</body>
+</html>

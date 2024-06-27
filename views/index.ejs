@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>What Matters?</title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>What Matters?</h1>
+        <nav>
+            <a href="/what-matters">What Matters?</a>
+            <a href="/today">Today</a>
+            <a href="/history">History</a>
+        </nav>
+    </header>
+    <main>
+        <form action="/what-matters" method="POST">
+            <input type="text" name="category" placeholder="Life Category" required>
+            <input type="text" name="goal" placeholder="Life Goal" required>
+            <button type="submit">Add Goal</button>
+        </form>
+        <ul>
+            <% goals.forEach(goal => { %>
+                <li>
+                    <strong><%= goal.category %>:</strong> <%= goal.goal %>
+                </li>
+            <% }) %>
+        </ul>
+    </main>
+</body>
+</html>
