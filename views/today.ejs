@@ -19,7 +19,8 @@
                 <div class="goal-entry">
                     <h3><%= goal.category %></h3>
                     <p><%= goal.goal %></p>
-                    <textarea name="entry" placeholder="What did you do today?"><%= entries[goal.category] || '' %></textarea>
+                    <% let entry = entries[goal.category] ? entries[goal.category] : ''; %>
+                    <textarea name="entry" placeholder="What did you do today?"><%= entry %></textarea>
                     <input type="hidden" name="category" value="<%= goal.category %>">
                     <button type="submit">Save</button>
                 </div>

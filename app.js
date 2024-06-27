@@ -11,7 +11,14 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 // Helper function to read/write data
-const readData = () => JSON.parse(fs.readFileSync('data.json', 'utf-8'));
+const readData = () => {
+    if (fs.existsSync('data.json')) {
+        return JSON.parse(fs.readFileSync('data.json', 'utf-8'));
+    } else {
+        return { goals: [], entries: {} };
+    }
+};
+
 const writeData = (data) => fs.writeFileSync('data.json', JSON.stringify(data, null, 2));
 
 // Routes
@@ -43,16 +50,62 @@ app.post('/what-matters', (req, res) => {
 app.get('/today', (req, res) => {
     const data = readData();
     const today = moment().format('YYYY-MM-DD');
-    res.render('today', { goals: data.goals, entries: data.entries[today] || {}, today });
+
+    // Ensure the entries structure is properly initialized
+    if (!data.entries) {
+        data.entries = {};
+    }
+
+    if (!data.entries[today]) {
+        data.entries[today] = {};
+    }
+
+    res.render('today', { goals: data.goals, entries: data.entries[today] });
 });
 
 app.post('/today', (req, res) => {
     const data = readData();
     const today = moment().format('YYYY-MM-DD');
+
+    // Ensure the entries structure is properly initialized
+    if (!data.entries) {
+        data.entries = {};
+    }
+
     if (!data.entries[today]) {
         data.entries[today] = {};
     }
-    data.entries[today][req.body.category] = req.body.entry;
+
+    const categories = req.body.category;
+    const entries = req.body.entry;
+
+    // Handle multiple categories and entries
+    if (Array.isArray(categories) && Array.isArray(entries)) {
+        categories.forEach((category, index) => {
+            const entry = entries[index];
+
+            // Save each entry under its respective category key
+            if (entry.trim() === "") {
+                delete data.entries[today][category];
+            } else {
+                data.entries[today][category] = entry;
+            }
+        });
+    } else {
+        // Handle single category and entry
+        const category = categories;
+        const entry = entries;
+
+        if (entry.trim() === "") {
+            delete data.entries[today][category];
+        } else {
+            data.entries[today][category] = entry;
+        }
+    }
+
+    // Debugging statement to check the structure before saving
+    console.log('Data Entries:', JSON.stringify(data.entries, null, 2));
+
     writeData(data);
     res.redirect('/today');
 });
