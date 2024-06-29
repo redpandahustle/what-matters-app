@@ -3,6 +3,28 @@
 <head>
     <title>Today</title>
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <style>
+        .rating {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .rating img {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            margin-right: 5px;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        .rating img:hover,
+        .rating img.selected {
+            filter: brightness(1.2);
+        }
+        .rating img.selected {
+            border-color: green;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -22,10 +44,27 @@
                     <% let entry = entries[goal.category] ? entries[goal.category] : ''; %>
                     <textarea name="entry" placeholder="What did you do today?"><%= entry %></textarea>
                     <input type="hidden" name="category" value="<%= goal.category %>">
-                    <button type="submit">Save</button>
+                    <div class="rating">
+                        <% for (let i = 1; i <= 5; i++) { %>
+                            <img src="/images/rating-<%= i %>.png" data-rating="<%= i %>" class="<%= entries[goal.category + '_rating'] == i ? 'selected' : '' %>">
+                        <% } %>
+                        <input type="hidden" name="rating_<%= goal.category %>" value="<%= entries[goal.category + '_rating'] %>">
+                    </div>
                 </div>
             <% }) %>
+            <button type="submit">Save</button>
         </form>
     </main>
+    <script>
+        document.querySelectorAll('.rating img').forEach(img => {
+            img.addEventListener('click', function() {
+                const parent = this.parentElement;
+                parent.querySelectorAll('img').forEach(img => img.classList.remove('selected'));
+                this.classList.add('selected');
+                const hiddenInput = parent.querySelector('input[type="hidden"]');
+                hiddenInput.value = this.dataset.rating;
+            });
+        });
+    </script>
 </body>
 </html>

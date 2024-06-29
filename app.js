@@ -22,6 +22,18 @@ const readData = () => {
 
 const writeData = (data) => fs.writeFileSync('data.json', JSON.stringify(data, null, 2));
 
+// Function to get rating descriptions
+const getRatingDescription = (rating) => {
+  switch (rating) {
+    case 1: return "Very Poor";
+    case 2: return "Poor";
+    case 3: return "Average";
+    case 4: return "Good";
+    case 5: return "Excellent";
+    default: return "";
+  }
+};
+
 // Routes
 app.get('/', (req, res) => {
   const data = readData();
@@ -60,7 +72,7 @@ app.get('/today', (req, res) => {
     data.entries[today] = {};
   }
 
-  res.render('today', { goals: data.goals, entries: data.entries[today] });
+  res.render('today', { goals: data.goals, entries: data.entries[today], getRatingDescription });
 });
 
 app.post('/today', (req, res) => {
@@ -75,32 +87,27 @@ app.post('/today', (req, res) => {
     data.entries[today] = {};
   }
 
-  const categories = req.body.category;
-  const entries = req.body.entry;
+  const categories = Array.isArray(req.body.category) ? req.body.category : [req.body.category];
+  const entries = Array.isArray(req.body.entry) ? req.body.entry : [req.body.entry];
 
-  if (Array.isArray(categories) && Array.isArray(entries)) {
-    categories.forEach((category, index) => {
-      const entry = entries[index];
-      if (entry.trim() === "") {
-        delete data.entries[today][category];
-      } else {
-        data.entries[today][category] = entry;
-      }
-    });
-  } else {
-    const category = categories;
-    const entry = entries;
+  categories.forEach((category, index) => {
+    const entry = entries[index];
+    const ratingKey = `rating_${category}`;
+    const rating = req.body[ratingKey];
 
-    if (entry.trim() === "") {
-      delete data.entries[today][category];
-    } else {
+    if (entry && entry.trim() !== "") {
       data.entries[today][category] = entry;
     }
-  }
+
+    if (rating && rating.trim() !== "") {
+      data.entries[today][`${category}_rating`] = rating;
+    }
+  });
 
   writeData(data);
   res.redirect('/today');
 });
+
 
 app.get('/history', (req, res) => {
   const data = readData();
