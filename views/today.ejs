@@ -4,6 +4,27 @@
     <title>Today</title>
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
     <style>
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .section {
+            flex: 1;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .section h2 {
+            text-align: center;
+        }
+        .goal-entry {
+            margin-bottom: 20px;
+        }
+        .goal-entry textarea {
+            width: 95%; /* Adjust the width as needed */
+            max-width: 100%; /* Ensure it doesn't overflow */
+        }
         .rating {
             display: flex;
             align-items: center;
@@ -37,21 +58,71 @@
     </header>
     <main>
         <form action="/today" method="POST">
-            <% goals.forEach(goal => { %>
-                <div class="goal-entry">
-                    <h3><%= goal.category %></h3>
-                    <p><%= goal.goal %></p>
-                    <% let entry = entries[goal.category] ? entries[goal.category] : ''; %>
-                    <textarea name="entry" placeholder="What did you do today?"><%= entry %></textarea>
-                    <input type="hidden" name="category" value="<%= goal.category %>">
-                    <div class="rating">
-                        <% for (let i = 1; i <= 5; i++) { %>
-                            <img src="/images/rating-<%= i %>.png" data-rating="<%= i %>" class="<%= entries[goal.category + '_rating'] == i ? 'selected' : '' %>">
+            <div class="container">
+                <div class="section" id="tbd">
+                    <h2>TBD</h2>
+                    <% goals.forEach(goal => { %>
+                        <% let entry = entries[goal.category] ? entries[goal.category] : ''; %>
+                        <% let rating = entries[goal.category + '_rating']; %>
+                        <% if (!rating) { %>
+                            <div class="goal-entry">
+                                <h3><%= goal.category %></h3>
+                                <p><%= goal.goal %></p>
+                                <textarea name="entry" placeholder="What did you do today?"><%= entry %></textarea>
+                                <input type="hidden" name="category" value="<%= goal.category %>">
+                                <div class="rating">
+                                    <% for (let i = 1; i <= 5; i++) { %>
+                                        <img src="/images/rating-<%= i %>.png" data-rating="<%= i %>" class="<%= entries[goal.category + '_rating'] == i ? 'selected' : '' %>">
+                                    <% } %>
+                                    <input type="hidden" name="rating_<%= goal.category %>" value="<%= entries[goal.category + '_rating'] %>">
+                                </div>
+                            </div>
                         <% } %>
-                        <input type="hidden" name="rating_<%= goal.category %>" value="<%= entries[goal.category + '_rating'] %>">
-                    </div>
+                    <% }) %>
                 </div>
-            <% }) %>
+                <div class="section" id="improvement">
+                    <h2>Room for Improvement</h2>
+                    <% goals.forEach(goal => { %>
+                        <% let entry = entries[goal.category] ? entries[goal.category] : ''; %>
+                        <% let rating = entries[goal.category + '_rating']; %>
+                        <% if (rating >= 1 && rating <= 3) { %>
+                            <div class="goal-entry">
+                                <h3><%= goal.category %></h3>
+                                <p><%= goal.goal %></p>
+                                <textarea name="entry" placeholder="What did you do today?"><%= entry %></textarea>
+                                <input type="hidden" name="category" value="<%= goal.category %>">
+                                <div class="rating">
+                                    <% for (let i = 1; i <= 5; i++) { %>
+                                        <img src="/images/rating-<%= i %>.png" data-rating="<%= i %>" class="<%= entries[goal.category + '_rating'] == i ? 'selected' : '' %>">
+                                    <% } %>
+                                    <input type="hidden" name="rating_<%= goal.category %>" value="<%= entries[goal.category + '_rating'] %>">
+                                </div>
+                            </div>
+                        <% } %>
+                    <% }) %>
+                </div>
+                <div class="section" id="crushed">
+                    <h2>Crushed it!</h2>
+                    <% goals.forEach(goal => { %>
+                        <% let entry = entries[goal.category] ? entries[goal.category] : ''; %>
+                        <% let rating = entries[goal.category + '_rating']; %>
+                        <% if (rating >= 4 && rating <= 5) { %>
+                            <div class="goal-entry">
+                                <h3><%= goal.category %></h3>
+                                <p><%= goal.goal %></p>
+                                <textarea name="entry" placeholder="What did you do today?"><%= entry %></textarea>
+                                <input type="hidden" name="category" value="<%= goal.category %>">
+                                <div class="rating">
+                                    <% for (let i = 1; i <= 5; i++) { %>
+                                        <img src="/images/rating-<%= i %>.png" data-rating="<%= i %>" class="<%= entries[goal.category + '_rating'] == i ? 'selected' : '' %>">
+                                    <% } %>
+                                    <input type="hidden" name="rating_<%= goal.category %>" value="<%= entries[goal.category + '_rating'] %>">
+                                </div>
+                            </div>
+                        <% } %>
+                    <% }) %>
+                </div>
+            </div>
             <button type="submit">Save</button>
         </form>
     </main>
