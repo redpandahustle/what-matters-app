@@ -13,9 +13,12 @@
         }
         nav {
             margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
         }
         nav a {
-            margin: 0 10px;
+            margin: 5px;
             text-decoration: none;
             color: #fff;
             background-color: #333;
@@ -55,10 +58,21 @@
             .goal-history {
                 width: 90%;
             }
+            nav {
+                flex-direction: column;
+            }
+            nav a {
+                margin: 5px 0;
+            }
         }
         @media (max-width: 480px) {
             .goal-history li {
                 font-size: 14px;
+            }
+            nav a {
+                padding: 8px 10px;
+                font-size: 14px;
+                margin: 3px 0;
             }
         }
     </style>
