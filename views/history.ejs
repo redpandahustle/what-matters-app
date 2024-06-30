@@ -3,6 +3,65 @@
 <head>
     <title>History</title>
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        header {
+            text-align: center;
+        }
+        nav {
+            margin: 20px 0;
+        }
+        nav a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #333;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        nav a:hover {
+            background-color: #555;
+        }
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .goal-history {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .goal-history h3 {
+            text-align: center;
+        }
+        .goal-history ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .goal-history li {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        @media (max-width: 768px) {
+            .goal-history {
+                width: 90%;
+            }
+        }
+        @media (max-width: 480px) {
+            .goal-history li {
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -19,11 +78,16 @@
                 <h3><%= goal.category %></h3>
                 <p><%= goal.goal %></p>
                 <ul>
-                    <% Object.keys(entries).forEach(date => { %>
-                        <% if (entries[date][goal.category]) { %>
+                    <% 
+                    const sortedDates = Object.keys(entries).sort((a, b) => new Date(b) - new Date(a));
+                    sortedDates.forEach(date => { 
+                        if (entries[date][goal.category]) { 
+                    %>
                             <li><%= date %>: <%= entries[date][goal.category] %></li>
-                        <% } %>
-                    <% }) %>
+                    <% 
+                        } 
+                    }) 
+                    %>
                 </ul>
             </div>
         <% }) %>

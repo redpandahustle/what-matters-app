@@ -3,10 +3,33 @@
 <head>
     <title>Today</title>
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        header {
+            text-align: center;
+        }
+        nav {
+            margin: 20px 0;
+        }
+        nav a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #333;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        nav a:hover {
+            background-color: #555;
+        }
         .container {
             display: flex;
             justify-content: space-between;
+            flex-wrap: wrap;
         }
         .section {
             flex: 1;
@@ -14,6 +37,7 @@
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            box-sizing: border-box;
         }
         .section h2 {
             text-align: center;
@@ -24,6 +48,7 @@
         .goal-entry textarea {
             width: 95%; /* Adjust the width as needed */
             max-width: 100%; /* Ensure it doesn't overflow */
+            resize: vertical;
         }
         .rating {
             display: flex;
@@ -44,6 +69,28 @@
         }
         .rating img.selected {
             border-color: green;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .section {
+                margin: 5px 0;
+                padding: 10px;
+            }
+            .goal-entry textarea {
+                width: 100%;
+            }
+        }
+        @media (max-width: 480px) {
+            .rating img {
+                width: 20px;
+                height: 20px;
+                margin-right: 3px;
+            }
+            .goal-entry textarea {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
