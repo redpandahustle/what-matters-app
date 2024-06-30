@@ -3,6 +3,111 @@
 <head>
     <title>What Matters?</title>
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        header {
+            text-align: center;
+        }
+        nav {
+            margin: 20px 0;
+        }
+        nav a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #333;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        nav a:hover {
+            background-color: #555;
+        }
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        form input, form button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        form input {
+            width: 200px;
+        }
+        form button {
+            width: 220px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            border-radius: 10px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            form input, form button {
+                width: 180px;
+            }
+        }
+        @media (max-width: 480px) {
+            form input, form button {
+                width: 150px;
+                font-size: 14px;
+            }
+            ul li {
+                font-size: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -15,17 +120,57 @@
     </header>
     <main>
         <form action="/what-matters" method="POST">
-            <input type="text" name="category" placeholder="Life Category" required>
-            <input type="text" name="goal" placeholder="Life Goal" required>
+            <input type="text" name="category" placeholder="What matters?" required>
+            <input type="text" name="goal" placeholder="Why does it matter?" required>
             <button type="submit">Add Goal</button>
         </form>
         <ul>
-            <% goals.forEach(goal => { %>
-                <li>
-                    <strong><%= goal.category %>:</strong> <%= goal.goal %>
-                </li>
-            <% }) %>
+            <% if (goals.length === 0) { %>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        document.getElementById('myModal').style.display = 'block';
+                    });
+                </script>
+            <% } else { %>
+                <% goals.forEach(goal => { %>
+                    <li>
+                        <strong><%= goal.category %>:</strong> <%= goal.goal %>
+                    </li>
+                <% }) %>
+            <% } %>
         </ul>
+        <!-- The Modal -->
+        <div id="myModal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Welcome to "What Matters?"</h2>
+                <p>This is NOT a to-do list. This is a simple app to help you focus your life on the things that actually matter to you.</p>
+                <p>Define WHY something matters so you can remind yourself of your why every day.</p>
+                <p>Track how you're doing each day and take notes/journal.</p>
+                <p>If you are feeling overwhelmed by anything not on this list, come back to the app to remind yourself that you're doing well in the places that really matter, so don't sweat it if it didn't make the cut to live here!</p>
+                <p>See your history in each "What Matters" category, kind of like a category-specific journal app, with ONLY things that matter!</p>
+                <p><strong>Example:</strong></p>
+                <p><strong>What Matters?</strong> = Side Hustle</p>
+                <p><strong>Why does it matter?</strong> I want an independent income so that I can create my own schedule and work it around my friends and my family, not around my job. I want to be as available to my wife and children as possible as we build our family.</p>
+            </div>
+        </div>
     </main>
+    <script>
+        // Get the modal
+        var modal = document.getElementById('myModal');
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName('close')[0];
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = 'none';
+        }
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
