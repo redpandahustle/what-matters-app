@@ -13,9 +13,12 @@
         }
         nav {
             margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
         }
         nav a {
-            margin: 0 10px;
+            margin: 5px;
             text-decoration: none;
             color: #fff;
             background-color: #333;
@@ -46,8 +49,9 @@
             margin-bottom: 20px;
         }
         .goal-entry textarea {
-            width: 95%; /* Adjust the width as needed */
-            max-width: 100%; /* Ensure it doesn't overflow */
+            width: 100%; /* Ensure it fits within its container */
+            max-width: 100%; /* Prevent overflow */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
             resize: vertical;
         }
         .rating {
@@ -78,8 +82,11 @@
                 margin: 5px 0;
                 padding: 10px;
             }
-            .goal-entry textarea {
-                width: 100%;
+            nav {
+                flex-direction: column;
+            }
+            nav a {
+                margin: 5px 0;
             }
         }
         @media (max-width: 480px) {
