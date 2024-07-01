@@ -63,6 +63,9 @@
         ul li {
             margin: 10px 0;
             font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .modal {
             display: none; /* Hidden by default */
@@ -135,9 +138,9 @@
     </header>
     <main>
         <form action="/what-matters" method="POST">
-            <input type="text" name="category" placeholder="What matters?" required>
-            <input type="text" name="goal" placeholder="Why does it matter?" required>
-            <button type="submit">Add Goal</button>
+            <input type="text" name="what_matters" placeholder="What matters?" required>
+            <input type="text" name="why_it_matters" placeholder="Why does it matter?" required>
+            <button type="submit">Add to My List</button>
         </form>
         <ul>
             <% if (goals.length === 0) { %>
@@ -149,7 +152,13 @@
             <% } else { %>
                 <% goals.forEach(goal => { %>
                     <li>
-                        <strong><%= goal.category %>:</strong> <%= goal.goal %>
+                        <div>
+                            <strong><%= goal.what_matters %>:</strong> <%= goal.why_it_matters %>
+                        </div>
+                        <form action="/archive" method="POST" style="display:inline;">
+                            <input type="hidden" name="id" value="<%= goal.id %>">
+                            <button type="submit">Archive</button>
+                        </form>
                     </li>
                 <% }) %>
             <% } %>

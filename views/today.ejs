@@ -116,19 +116,18 @@
                 <div class="section" id="tbd">
                     <h2>TBD</h2>
                     <% goals.forEach(goal => { %>
-                        <% let entry = entries[goal.category] ? entries[goal.category] : ''; %>
-                        <% let rating = entries[goal.category + '_rating']; %>
+                        <% let entry = entries[goal.id] ? entries[goal.id].entry : ''; %>
+                        <% let rating = entries[goal.id] ? entries[goal.id].rating : ''; %>
                         <% if (!rating) { %>
                             <div class="goal-entry">
-                                <h3><%= goal.category %></h3>
-                                <p><%= goal.goal %></p>
-                                <textarea name="entry" placeholder="What did you do today?"><%= entry %></textarea>
-                                <input type="hidden" name="category" value="<%= goal.category %>">
+                                <h3><%= goal.what_matters %></h3>
+                                <p><%= goal.why_it_matters %></p>
+                                <textarea name="entry_<%= goal.id %>" placeholder="What did you do today?"><%= entry %></textarea>
                                 <div class="rating">
                                     <% for (let i = 1; i <= 5; i++) { %>
-                                        <img src="/images/rating-<%= i %>.png" data-rating="<%= i %>" class="<%= entries[goal.category + '_rating'] == i ? 'selected' : '' %>">
+                                        <img src="/images/rating-<%= i %>.png" data-rating="<%= i %>" class="<%= rating == i ? 'selected' : '' %>">
                                     <% } %>
-                                    <input type="hidden" name="rating_<%= goal.category %>" value="<%= entries[goal.category + '_rating'] %>">
+                                    <input type="hidden" name="rating_<%= goal.id %>" value="<%= rating %>">
                                 </div>
                             </div>
                         <% } %>
@@ -137,19 +136,18 @@
                 <div class="section" id="improvement">
                     <h2>Room for Improvement</h2>
                     <% goals.forEach(goal => { %>
-                        <% let entry = entries[goal.category] ? entries[goal.category] : ''; %>
-                        <% let rating = entries[goal.category + '_rating']; %>
+                        <% let entry = entries[goal.id] ? entries[goal.id].entry : ''; %>
+                        <% let rating = entries[goal.id] ? entries[goal.id].rating : ''; %>
                         <% if (rating >= 1 && rating <= 3) { %>
                             <div class="goal-entry">
-                                <h3><%= goal.category %></h3>
-                                <p><%= goal.goal %></p>
-                                <textarea name="entry" placeholder="What did you do today?"><%= entry %></textarea>
-                                <input type="hidden" name="category" value="<%= goal.category %>">
+                                <h3><%= goal.what_matters %></h3>
+                                <p><%= goal.why_it_matters %></p>
+                                <textarea name="entry_<%= goal.id %>" placeholder="What did you do today?"><%= entry %></textarea>
                                 <div class="rating">
                                     <% for (let i = 1; i <= 5; i++) { %>
-                                        <img src="/images/rating-<%= i %>.png" data-rating="<%= i %>" class="<%= entries[goal.category + '_rating'] == i ? 'selected' : '' %>">
+                                        <img src="/images/rating-<%= i %>.png" data-rating="<%= i %>" class="<%= rating == i ? 'selected' : '' %>">
                                     <% } %>
-                                    <input type="hidden" name="rating_<%= goal.category %>" value="<%= entries[goal.category + '_rating'] %>">
+                                    <input type="hidden" name="rating_<%= goal.id %>" value="<%= rating %>">
                                 </div>
                             </div>
                         <% } %>
@@ -158,19 +156,18 @@
                 <div class="section" id="crushed">
                     <h2>Crushed it!</h2>
                     <% goals.forEach(goal => { %>
-                        <% let entry = entries[goal.category] ? entries[goal.category] : ''; %>
-                        <% let rating = entries[goal.category + '_rating']; %>
+                        <% let entry = entries[goal.id] ? entries[goal.id].entry : ''; %>
+                        <% let rating = entries[goal.id] ? entries[goal.id].rating : ''; %>
                         <% if (rating >= 4 && rating <= 5) { %>
                             <div class="goal-entry">
-                                <h3><%= goal.category %></h3>
-                                <p><%= goal.goal %></p>
-                                <textarea name="entry" placeholder="What did you do today?"><%= entry %></textarea>
-                                <input type="hidden" name="category" value="<%= goal.category %>">
+                                <h3><%= goal.what_matters %></h3>
+                                <p><%= goal.why_it_matters %></p>
+                                <textarea name="entry_<%= goal.id %>" placeholder="What did you do today?"><%= entry %></textarea>
                                 <div class="rating">
                                     <% for (let i = 1; i <= 5; i++) { %>
-                                        <img src="/images/rating-<%= i %>.png" data-rating="<%= i %>" class="<%= entries[goal.category + '_rating'] == i ? 'selected' : '' %>">
+                                        <img src="/images/rating-<%= i %>.png" data-rating="<%= i %>" class="<%= rating == i ? 'selected' : '' %>">
                                     <% } %>
-                                    <input type="hidden" name="rating_<%= goal.category %>" value="<%= entries[goal.category + '_rating'] %>">
+                                    <input type="hidden" name="rating_<%= goal.id %>" value="<%= rating %>">
                                 </div>
                             </div>
                         <% } %>
