@@ -1,26 +1,39 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const moment = require('moment');
-const fs = require('fs');
 const path = require('path');
+const postgres = require('postgres');
+require('dotenv').config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Postgres connection
+const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
+
+const sql = postgres({
+  host: PGHOST,
+  database: PGDATABASE,
+  username: PGUSER,
+  password: PGPASSWORD,
+  port: 5432,
+  ssl: 'require',
+  connection: {
+    options: `project=${ENDPOINT_ID}`,
+  },
+});
+
+async function getPgVersion() {
+  const result = await sql`select version()`;
+  console.log(result);
+}
+
+getPgVersion();
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
-
-// Helper function to read/write data
-const readData = () => {
-  if (fs.existsSync('data.json')) {
-    return JSON.parse(fs.readFileSync('data.json', 'utf-8'));
-  } else {
-    return { goals: [], entries: {} };
-  }
-};
-
-const writeData = (data) => fs.writeFileSync('data.json', JSON.stringify(data, null, 2));
 
 // Function to get rating descriptions
 const getRatingDescription = (rating) => {
@@ -35,83 +48,132 @@ const getRatingDescription = (rating) => {
 };
 
 // Routes
-app.get('/', (req, res) => {
-  const data = readData();
-  if (data.goals.length === 0) {
+app.get('/', async (req, res) => {
+  try {
+    const goals = await sql`SELECT * FROM what_matters_list WHERE archived = false`;
+    if (goals.length === 0) {
+      res.redirect('/what-matters');
+    } else {
+      res.redirect('/today');
+    }
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
+app.get('/what-matters', async (req, res) => {
+  try {
+    const goals = await sql`SELECT * FROM what_matters_list WHERE archived = false`;
+    const archivedGoals = await sql`SELECT * FROM what_matters_list WHERE archived = true`;
+    res.render('index', { goals, archivedGoals });
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
+app.post('/what-matters', async (req, res) => {
+  const { what_matters, why_it_matters } = req.body;
+  try {
+    await sql`INSERT INTO what_matters_list (what_matters, why_it_matters, archived) VALUES (${what_matters}, ${why_it_matters}, false)`;
     res.redirect('/what-matters');
-  } else {
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
+app.post('/archive', async (req, res) => {
+  const { id } = req.body;
+  try {
+    await sql`UPDATE what_matters_list SET archived = true WHERE id = ${id}`;
+    res.redirect('/what-matters');
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
+app.get('/today', async (req, res) => {
+  try {
+    const goals = await sql`SELECT * FROM what_matters_list WHERE archived = false`;
+    const today = moment().format('YYYY-MM-DD');
+    const entries = await sql`SELECT * FROM entries WHERE entry_date = ${today}`;
+    const entriesMap = {};
+
+    entries.forEach(entry => {
+      entriesMap[entry.what_matters_id] = { entry: entry.entry, rating: entry.rating };
+    });
+
+    res.render('today', { goals, entries: entriesMap, getRatingDescription });
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
+app.post('/today', async (req, res) => {
+  const today = moment().format('YYYY-MM-DD');
+
+  try {
+    const goals = await sql`SELECT * FROM what_matters_list WHERE archived = false`;
+
+    for (let goal of goals) {
+      const entry = req.body[`entry_${goal.id}`];
+      const rating = req.body[`rating_${goal.id}`];
+
+      // Logging the values to troubleshoot
+      console.log(`Processing entry for what_matters_id: ${goal.id}`);
+      console.log(`Entry: ${entry}`);
+      console.log(`Rating: ${rating}`);
+
+      if (entry && entry.trim() !== "") {
+        await sql`
+          INSERT INTO entries (user_id, what_matters_id, entry_date, entry, rating)
+          VALUES (1, ${goal.id}, ${today}, ${entry}, ${rating})
+          ON CONFLICT (user_id, what_matters_id, entry_date)
+          DO UPDATE SET entry = ${entry}, rating = ${rating}
+        `;
+        console.log(`Inserted/Updated entry for what_matters_id: ${goal.id}`);
+      }
+    }
+
     res.redirect('/today');
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
   }
 });
 
-app.get('/what-matters', (req, res) => {
-  const data = readData();
-  res.render('index', { goals: data.goals });
-});
+app.get('/history', async (req, res) => {
+  try {
+    const goals = await sql`SELECT * FROM what_matters_list WHERE archived = false`;
+    const archivedGoals = await sql`SELECT * FROM what_matters_list WHERE archived = true`;
+    const entries = await sql`
+      SELECT 
+        what_matters_id, 
+        to_char(entry_date, 'YYYY-MM-DD') as entry_date, 
+        entry, 
+        rating 
+      FROM 
+        entries
+    `;
+    const entriesMap = {};
 
-app.post('/what-matters', (req, res) => {
-  const data = readData();
-  const newGoal = {
-    category: req.body.category,
-    goal: req.body.goal
-  };
-  data.goals.push(newGoal);
-  writeData(data);
-  res.redirect('/what-matters');
-});
+    entries.forEach(entry => {
+      const date = entry.entry_date;
+      if (!entriesMap[date]) {
+        entriesMap[date] = {};
+      }
+      entriesMap[date][entry.what_matters_id] = { entry: entry.entry, rating: entry.rating };
+    });
 
-app.get('/today', (req, res) => {
-  const data = readData();
-  const today = moment().format('YYYY-MM-DD');
-
-  if (!data.entries) {
-    data.entries = {};
+    res.render('history', { goals, archivedGoals, entries: entriesMap });
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
   }
-
-  if (!data.entries[today]) {
-    data.entries[today] = {};
-  }
-
-  res.render('today', { goals: data.goals, entries: data.entries[today], getRatingDescription });
-});
-
-app.post('/today', (req, res) => {
-  const data = readData();
-  const today = moment().format('YYYY-MM-DD');
-
-  if (!data.entries) {
-    data.entries = {};
-  }
-
-  if (!data.entries[today]) {
-    data.entries[today] = {};
-  }
-
-  const categories = Array.isArray(req.body.category) ? req.body.category : [req.body.category];
-  const entries = Array.isArray(req.body.entry) ? req.body.entry : [req.body.entry];
-
-  categories.forEach((category, index) => {
-    const entry = entries[index];
-    const ratingKey = `rating_${category}`;
-    const rating = req.body[ratingKey];
-
-    if (entry && entry.trim() !== "") {
-      data.entries[today][category] = entry;
-    }
-
-    if (rating && rating.trim() !== "") {
-      data.entries[today][`${category}_rating`] = rating;
-    }
-  });
-
-  writeData(data);
-  res.redirect('/today');
-});
-
-
-app.get('/history', (req, res) => {
-  const data = readData();
-  res.render('history', { goals: data.goals, entries: data.entries });
 });
 
 app.listen(PORT, () => {

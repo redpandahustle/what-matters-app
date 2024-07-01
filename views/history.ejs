@@ -89,15 +89,34 @@
     <main>
         <% goals.forEach(goal => { %>
             <div class="goal-history">
-                <h3><%= goal.category %></h3>
-                <p><%= goal.goal %></p>
+                <h3><%= goal.what_matters %></h3>
+                <p><%= goal.why_it_matters %></p>
                 <ul>
                     <% 
                     const sortedDates = Object.keys(entries).sort((a, b) => new Date(b) - new Date(a));
                     sortedDates.forEach(date => { 
-                        if (entries[date][goal.category]) { 
+                        if (entries[date][goal.id]) { 
                     %>
-                            <li><%= date %>: <%= entries[date][goal.category] %></li>
+                            <li><%= date %>: <%= entries[date][goal.id].entry %></li>
+                    <% 
+                        } 
+                    }) 
+                    %>
+                </ul>
+            </div>
+        <% }) %>
+        <h2>Archived Goals</h2>
+        <% archivedGoals.forEach(goal => { %>
+            <div class="goal-history">
+                <h3><%= goal.what_matters %></h3>
+                <p><%= goal.why_it_matters %></p>
+                <ul>
+                    <% 
+                    const sortedDates = Object.keys(entries).sort((a, b) => new Date(b) - new Date(a));
+                    sortedDates.forEach(date => { 
+                        if (entries[date][goal.id]) { 
+                    %>
+                            <li><%= date %>: <%= entries[date][goal.id].entry %></li>
                     <% 
                         } 
                     }) 
