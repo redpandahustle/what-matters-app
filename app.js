@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const moment = require('moment');
+const momentTimezone = require('moment-timezone');
 const path = require('path');
 const postgres = require('postgres');
 require('dotenv').config();
@@ -98,7 +99,7 @@ app.post('/archive', async (req, res) => {
 app.get('/today', async (req, res) => {
   try {
     const goals = await sql`SELECT * FROM what_matters_list WHERE archived = false`;
-    const today = moment().format('YYYY-MM-DD');
+    const today = momentTimezone().tz('America/Chicago').format('YYYY-MM-DD');
     const entries = await sql`SELECT * FROM entries WHERE entry_date = ${today}`;
     const entriesMap = {};
 
@@ -114,7 +115,7 @@ app.get('/today', async (req, res) => {
 });
 
 app.post('/today', async (req, res) => {
-  const today = moment().format('YYYY-MM-DD');
+  const today = momentTimezone().tz('America/Chicago').format('YYYY-MM-DD');
 
   try {
     const goals = await sql`SELECT * FROM what_matters_list WHERE archived = false`;
